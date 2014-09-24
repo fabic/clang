@@ -3627,6 +3627,22 @@ SanitizerMask Linux::getSupportedSanitizers() const {
   return Res;
 }
 
+// FabiC //
+void Linux::AddCXXStdlibLibArgs(const ArgList &Args,
+                                 ArgStringList &CmdArgs) const {
+  switch (GetCXXStdlibType(Args)) {
+  case ToolChain::CST_Libcxx:
+    CmdArgs.push_back("-lc++");
+    CmdArgs.push_back("-lc++abi");
+    CmdArgs.push_back("-lpthread");
+    break;
+  case ToolChain::CST_Libstdcxx:
+    CmdArgs.push_back("-lstdc++");
+    break;
+  }
+}
+// ^^ FabiC ^^ //
+
 /// DragonFly - DragonFly tool chain which can call as(1) and ld(1) directly.
 
 DragonFly::DragonFly(const Driver &D, const llvm::Triple &Triple,

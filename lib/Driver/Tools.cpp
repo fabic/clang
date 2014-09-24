@@ -2390,13 +2390,9 @@ static void addClangRT(const ToolChain &TC, const ArgList &Args,
 
   if (!TC.getTriple().isOSWindows()) {
     // FIXME: why do we link against gcc when we are using compiler-rt?
-    //CmdArgs.push_back("-lgcc_s");
-    //if (TC.getDriver().CCCIsCXX())
-    //  CmdArgs.push_back("-lgcc_eh");
-    // ^ FABIC: lib unwind :
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc_s");
     if (TC.getDriver().CCCIsCXX())
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_eh");
   }
 }
 
@@ -5872,7 +5868,7 @@ static void constructHexagonLinkArgs(Compilation &C, const JobAction &JA,
         CmdArgs.push_back(Args.MakeArgString("-l" + Lib));
       CmdArgs.push_back("-lc");
     }
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc");
 
     CmdArgs.push_back("--end-group");
   }
@@ -6809,9 +6805,9 @@ void solaris::Linker::ConstructJob(Compilation &C, const JobAction &JA,
       !Args.hasArg(options::OPT_nodefaultlibs)) {
     if (getToolChain().getDriver().CCCIsCXX())
       getToolChain().AddCXXStdlibLibArgs(Args, CmdArgs);
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc_s");
     if (!Args.hasArg(options::OPT_shared)) {
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc");
       CmdArgs.push_back("-lc");
       CmdArgs.push_back("-lm");
     }
@@ -6996,7 +6992,7 @@ void openbsd::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
     // FIXME: For some reason GCC passes -lgcc before adding
     // the default system libraries. Just mimic this for now.
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc");
 
     if (Args.hasArg(options::OPT_pthread)) {
       if (!Args.hasArg(options::OPT_shared) && Args.hasArg(options::OPT_pg))
@@ -7012,7 +7008,7 @@ void openbsd::Linker::ConstructJob(Compilation &C, const JobAction &JA,
         CmdArgs.push_back("-lc");
     }
 
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc");
   }
 
   if (!Args.hasArg(options::OPT_nostdlib) &&
@@ -7372,16 +7368,16 @@ void freebsd::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     // FIXME: For some reason GCC passes -lgcc and -lgcc_s before adding
     // the default system libraries. Just mimic this for now.
     if (Args.hasArg(options::OPT_pg))
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_p");
     else
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc");
     if (Args.hasArg(options::OPT_static)) {
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_eh");
     } else if (Args.hasArg(options::OPT_pg)) {
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_eh_p");
     } else {
       CmdArgs.push_back("--as-needed");
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_s");
       CmdArgs.push_back("--no-as-needed");
     }
 
@@ -7397,19 +7393,19 @@ void freebsd::Linker::ConstructJob(Compilation &C, const JobAction &JA,
         CmdArgs.push_back("-lc");
       else
         CmdArgs.push_back("-lc_p");
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_p");
     } else {
       CmdArgs.push_back("-lc");
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc");
     }
 
     if (Args.hasArg(options::OPT_static)) {
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_eh");
     } else if (Args.hasArg(options::OPT_pg)) {
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_eh_p");
     } else {
       CmdArgs.push_back("--as-needed");
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc_s");
       CmdArgs.push_back("--no-as-needed");
     }
   }
@@ -7689,13 +7685,13 @@ void netbsd::Linker::ConstructJob(Compilation &C, const JobAction &JA,
         // libgcc_eh depends on libc, so resolve as much as possible,
         // pull in any new requirements from libc and then get the rest
         // of libgcc.
-        CmdArgs.push_back("-lunwind");
+        CmdArgs.push_back("-lgcc_eh");
         CmdArgs.push_back("-lc");
-        CmdArgs.push_back("-lunwind");
+        CmdArgs.push_back("-lgcc");
       } else {
-        CmdArgs.push_back("-lunwind");
+        CmdArgs.push_back("-lgcc");
         CmdArgs.push_back("--as-needed");
-        CmdArgs.push_back("-lunwind");
+        CmdArgs.push_back("-lgcc_s");
         CmdArgs.push_back("--no-as-needed");
       }
     }
@@ -7936,25 +7932,23 @@ static void AddLibgcc(const llvm::Triple &Triple, const Driver &D,
   bool StaticLibgcc = Args.hasArg(options::OPT_static_libgcc) ||
                       Args.hasArg(options::OPT_static);
   if (!D.CCCIsCXX())
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc");
 
   if (StaticLibgcc || isAndroid) {
     if (D.CCCIsCXX())
-      CmdArgs.push_back("-lunwind");
+      CmdArgs.push_back("-lgcc");
   } else {
     if (!D.CCCIsCXX() && !isCygMing)
       CmdArgs.push_back("--as-needed");
-    //CmdArgs.push_back("-lgcc_s");
-    // ^ FABIC: lib unwind
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc_s");
     if (!D.CCCIsCXX() && !isCygMing)
       CmdArgs.push_back("--no-as-needed");
   }
 
   if (StaticLibgcc && !isAndroid)
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc_eh");
   else if (!Args.hasArg(options::OPT_shared) && D.CCCIsCXX())
-    CmdArgs.push_back("-lunwind");
+    CmdArgs.push_back("-lgcc");
 
   // According to Android ABI, we have to link with libdl if we are
   // linking with non-static libgcc.
@@ -8699,25 +8693,25 @@ void dragonfly::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     if (UseGCC47) {
       if (Args.hasArg(options::OPT_static) ||
           Args.hasArg(options::OPT_static_libgcc)) {
-        CmdArgs.push_back("-lunwind");
-        CmdArgs.push_back("-lunwind");
+        CmdArgs.push_back("-lgcc");
+        CmdArgs.push_back("-lgcc_eh");
       } else {
         if (Args.hasArg(options::OPT_shared_libgcc)) {
-          CmdArgs.push_back("-lunwind");
+          CmdArgs.push_back("-lgcc_pic");
           if (!Args.hasArg(options::OPT_shared))
-            CmdArgs.push_back("-lunwind");
+            CmdArgs.push_back("-lgcc");
         } else {
-          CmdArgs.push_back("-lunwind");
+          CmdArgs.push_back("-lgcc");
           CmdArgs.push_back("--as-needed");
-          CmdArgs.push_back("-lunwind");
+          CmdArgs.push_back("-lgcc_pic");
           CmdArgs.push_back("--no-as-needed");
         }
       }
     } else {
       if (Args.hasArg(options::OPT_shared)) {
-        CmdArgs.push_back("-lunwind");
+        CmdArgs.push_back("-lgcc_pic");
       } else {
-        CmdArgs.push_back("-lunwind");
+        CmdArgs.push_back("-lgcc");
       }
     }
   }

@@ -385,8 +385,7 @@ void DarwinClang::AddLinkRuntimeLibArgs(const ArgList &Args,
     // it never went into the SDK.
     // Linking against libgcc_s.1 isn't needed for iOS 5.0+
     if (isIPhoneOSVersionLT(5, 0) && !isTargetIOSSimulator() &&
-        (getTriple().getArch() != llvm::Triple::arm64 &&
-         getTriple().getArch() != llvm::Triple::aarch64))
+        getTriple().getArch() != llvm::Triple::aarch64)
       CmdArgs.push_back("-lunwind");
       // ^ FABIC: lib unwind, instead of :
       //CmdArgs.push_back("-lgcc_s.1");

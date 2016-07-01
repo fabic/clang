@@ -289,7 +289,12 @@ public:
   }
 
   virtual CXXStdlibType GetDefaultCXXStdlibType() const {
-    return ToolChain::CST_Libstdcxx;
+    // FabiC / 2015 / 2016-07-01 (release 3.8) //
+    // ~> Set LLVM/Clang's libc++/abi as the default STL implementation.
+    return ToolChain::CST_Libcxx;
+    // ~> Orig. :
+    //return ToolChain::CST_Libstdcxx;
+    // ^^ FabiC ^^ //
   }
 
   virtual std::string getCompilerRT(const llvm::opt::ArgList &Args,

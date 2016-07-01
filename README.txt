@@ -7,16 +7,27 @@
   Set 'master' to v3.5.0 + a couple of "personnal" commits.
 
 * __FC.2016-07-01 :__
-  Years after, re-applying Clang patch for default `libc++` against
-  [`release_38`](https://github.com/llvm-mirror/clang/tree/release_38)
+  Years after, re-applying Clang patch for default `libc++` against release_38
+  (https://github.com/llvm-mirror/clang/tree/release_38)
 
-* See <https://github.com/fabic/llvm-clang> for the playground project that
+* See https://github.com/fabic/llvm-clang for the playground project that
   includes this one thing as a Git submodule.
 
-* See the __patch__ file
-  [`patches/fabic-clang-linux-libcxx-default.patch`](https://github.com/fabic/llvm-clang/blob/master/llvm-clang/patches/fabic-clang-linux-libcxx-default.patch)
+* See the __patch__ file at
+  https://github.com/fabic/llvm-clang/blob/master/llvm-clang/patches/fabic-clang-linux-libcxx-default.patch
   for a diff of the few changes brought here to the code of Clang.
-  Apply with ex. `patch -Np1 -b -i ../patches/fabic-clang-linux-libcxx-default.patch`
+
+  This patch was generated from here with :
+
+	git diff HEAD~ > ../patches/fabic-clang-linux-libcxx-default.patch
+
+  And may be applied (upon the official release_38 source tree) with ex. :
+
+    patch -Np1 -b -i ../patches/fabic-clang-linux-libcxx-default.patch
+
+* Original work dates back september 2014 :
+
+	`git log --graph --stat --summary --decorate --source --abbrev-commit -p b499f75..origin/fabic_35 `
 
 //===----------------------------------------------------------------------===//
 // C Language Family Front-end

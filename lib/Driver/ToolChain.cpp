@@ -544,7 +544,12 @@ ToolChain::CXXStdlibType ToolChain::GetCXXStdlibType(const ArgList &Args) const{
       << A->getAsString(Args);
   }
 
-  return ToolChain::CST_Libstdcxx;
+  // FabiC / 2015 / 2016-07-01 (release 3.8) //
+  // ~> Set LLVM/Clang's libc++/abi as the default STL implementation.
+  return ToolChain::CST_Libcxx;
+  // ~> Orig. :
+  // return ToolChain::CST_Libstdcxx;
+  // ^^ FabiC ^^ //
 }
 
 /// \brief Utility function to add a system include directory to CC1 arguments.

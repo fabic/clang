@@ -793,6 +793,14 @@ public:
   void AddClangCXXStdlibIncludeArgs(
       const llvm::opt::ArgList &DriverArgs,
       llvm::opt::ArgStringList &CC1Args) const override;
+
+  // FabiC / 2015 (release 3.6) / 2017-07-01 (release 3.8) //
+  // See `lib/Driver/ToolChains.cpp` for the impl.         //
+  void
+  AddCXXStdlibLibArgs(const llvm::opt::ArgList &Args,
+                      llvm::opt::ArgStringList &CmdArgs) const override;
+  // ^^ FabiC ^^ //
+
   void AddCudaIncludeArgs(const llvm::opt::ArgList &DriverArgs,
                           llvm::opt::ArgStringList &CC1Args) const override;
   bool isPIEDefault() const override;

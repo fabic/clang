@@ -10,6 +10,9 @@
   Years after, re-applying Clang patch for default `libc++` against
   [`release_38`](https://github.com/llvm-mirror/clang/tree/release_38)
 
+* __FC.2017-02-11 :__
+  Rebased upon release_40 (blindly)
+
 * See <https://github.com/fabic/llvm-clang> for the playground project that
   includes this one thing as a Git submodule.
 

@@ -5,13 +5,6 @@ cmake_minimum_required(VERSION 3.4.3)
 if( CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR )
   project(Clang)
 
-  # FABIC/2017-02-21
-  # https://crascit.com/2016/04/09/using-ccache-with-cmake/
-  find_program(CCACHE_PROGRAM ccache)
-  if(CCACHE_PROGRAM)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-  endif()
-
   # Rely on llvm-config.
   set(CONFIG_OUTPUT)
   find_program(LLVM_CONFIG "llvm-config")
